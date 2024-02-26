@@ -1,0 +1,30 @@
+version: "3.8"
+services:
+  studentdb:
+    image: mysql:8.0.35
+    container_name: studentdb
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: std
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "studentdb" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  student-service:
+    image: mystudent:latest
+    container_name: student-spb
+   # build: .
+    ports:
+      - "9090:8080"
+    environment:
+      DB_HOST: studentdb
+      DB_USER: root
+      DB_PASSWORD: 1234
+    depends_on:
+      studentdb:
+        condition: service_healthy
